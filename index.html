@@ -1,0 +1,188 @@
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="Matlab.css">
+<title>Java Objects in Matlab</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-01-08"><meta name="DC.source" content="index.m"><style type="text/css">
+
+</style></head><body><div class="content"><h2>Contents</h2>
+<div><ul><li><a href="#1">What are Java Class Objects?</a></li><li><a href="#9">Loading Java Classes in Matlab</a></li><li><a href="#13">References</a></li></ul></div><h2>What are Java Class Objects?<a name="1"></a></h2><p>Think of <a href="http://docs.oracle.com/javase/8/docs/api/java/lang/Class.html">Class</a> objects as blueprint for creating instances. Another way to think of objects of type Class is as a meta-object.  That is, class objects contain metadata information about an object such as</p><div><ul><li>name</li><li>methods</li><li>constructors</li><li>annotations</li></ul></div><p>and other various helper functions such as <i>isInterface()</i> and <i>isAbstract()</i> etc.</p><p>Typically, Class objects can be obtained by asking an instance for it's Class like this:</p><pre class="codeinput"><span class="comment">% create an instance of an ArrayList</span>
+list = java.util.ArrayList();
+
+<span class="comment">% ask the ArrayList instance for its Class</span>
+arrayListClass = list.getClass()
+</pre><pre class="codeoutput"> 
+arrayListClass =
+
+class java.util.ArrayList
+
+</pre><p>Using the Class object we can make queries about the ArrayList object such</p><pre class="codeinput"><span class="comment">% what is the name of the package which contains ArrayList</span>
+pkg = arrayListClass.getPackage()
+
+<span class="comment">% figure out what methods the instance responds to</span>
+arrayListMethods = arrayListClass.getMethods()
+</pre><pre class="codeoutput"> 
+pkg =
+
+package java.util, Java Platform API Specification, version 1.7
+
+
+arrayListMethods =
+
+java.lang.reflect.Method[]:
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+[java.lang.reflect.Method]
+
+
+
+</pre><p>And for the purposes of building proxy objects, we are particularly interested in interfaces</p><pre class="codeinput"><span class="comment">% figure out if the class implements any interfaces</span>
+interfaces = arrayListClass.getInterfaces()
+</pre><pre class="codeoutput"> 
+interfaces =
+
+java.lang.Class[]:
+[java.lang.Class]
+[java.lang.Class]
+[java.lang.Class]
+[java.lang.Class]
+
+
+
+</pre><p>Notice that when asking for interfaces we get back an array of Class objects, one for each interface implemented.  These Class objects will allow us to make queries about interfaces implmented.  For example</p><pre class="codeinput"><span class="comment">% print the names of each interface implemented by ArrayList</span>
+arrayfun(@(i)disp(i.getName()),interfaces)
+</pre><pre class="codeoutput">java.util.List
+
+java.util.RandomAccess
+
+java.lang.Cloneable
+
+java.io.Serializable
+
+</pre><p>Similarly, it is straight forward to obtain the method signatures for all methods of ArrayList</p><pre class="codeinput"><span class="comment">% print out function signatures for all methods of ArrayList</span>
+arrayfun(@(m)disp(char(m.toGenericString())),arrayListMethods)
+</pre><pre class="codeoutput">public void java.util.ArrayList.add(int,E)
+public boolean java.util.ArrayList.add(E)
+public E java.util.ArrayList.remove(int)
+public boolean java.util.ArrayList.remove(java.lang.Object)
+public E java.util.ArrayList.get(int)
+public java.lang.Object java.util.ArrayList.clone()
+public int java.util.ArrayList.indexOf(java.lang.Object)
+public void java.util.ArrayList.clear()
+public boolean java.util.ArrayList.isEmpty()
+public int java.util.ArrayList.lastIndexOf(java.lang.Object)
+public boolean java.util.ArrayList.contains(java.lang.Object)
+public int java.util.ArrayList.size()
+public java.util.List&lt;E&gt; java.util.ArrayList.subList(int,int)
+public java.lang.Object[] java.util.ArrayList.toArray()
+public &lt;T&gt; T[] java.util.ArrayList.toArray(T[])
+public boolean java.util.ArrayList.addAll(java.util.Collection&lt;? extends E&gt;)
+public boolean java.util.ArrayList.addAll(int,java.util.Collection&lt;? extends E&gt;)
+public java.util.Iterator&lt;E&gt; java.util.ArrayList.iterator()
+public E java.util.ArrayList.set(int,E)
+public void java.util.ArrayList.ensureCapacity(int)
+public void java.util.ArrayList.trimToSize()
+public boolean java.util.ArrayList.removeAll(java.util.Collection&lt;?&gt;)
+public boolean java.util.ArrayList.retainAll(java.util.Collection&lt;?&gt;)
+public java.util.ListIterator&lt;E&gt; java.util.ArrayList.listIterator(int)
+public java.util.ListIterator&lt;E&gt; java.util.ArrayList.listIterator()
+public boolean java.util.AbstractList.equals(java.lang.Object)
+public int java.util.AbstractList.hashCode()
+public java.lang.String java.util.AbstractCollection.toString()
+public boolean java.util.AbstractCollection.containsAll(java.util.Collection&lt;?&gt;)
+public final void java.lang.Object.wait(long,int) throws java.lang.InterruptedException
+public final native void java.lang.Object.wait(long) throws java.lang.InterruptedException
+public final void java.lang.Object.wait() throws java.lang.InterruptedException
+public final native java.lang.Class&lt;?&gt; java.lang.Object.getClass()
+public final native void java.lang.Object.notify()
+public final native void java.lang.Object.notifyAll()
+</pre><p>Finally, to actually instaciate an ArrayList instance (i.e. an actual ArrayList rather than metadata about an ArrayList) we can as the Class object to create one for us</p><pre class="codeinput"><span class="comment">% create instance of ArrayList using it's Class object</span>
+arrayList = arrayListClass.newInstance()
+</pre><pre class="codeoutput"> 
+arrayList =
+
+[]
+
+</pre><p>Authenticity can be verified using built-in Matlab function <i>isa</i></p><pre class="codeinput"><span class="comment">% confirm arrayList is actually of type java.util.ArrayList</span>
+isa(arrayList,<span class="string">'java.util.ArrayList'</span>)
+</pre><pre class="codeoutput">
+ans =
+
+1
+
+</pre><p>and likewise, the verification in a very round about fashion which emphisizes use of the associated Class object</p><pre class="codeinput">strcmp(<span class="string">'java.util.ArrayList'</span>,arrayList.getClass().getName())
+</pre><pre class="codeoutput">
+ans =
+
+1
+
+</pre><h2>Loading Java Classes in Matlab<a name="9"></a></h2><p>The first step in building a Java proxy is to load the Class blueprint.  Classes in Java can be listed on the static class path (loaded at launch) or the dynamic class path (loaded at runtime) However, loading Java Classes on the dynamic classpath in Matlab can be a little fickle.</p><p>If the class to load is listed on Matlab's static class path ($matlabroot/toolbox/local/classpath.txt) then the simplest way to proceed is</p><pre class="codeinput"><span class="comment">% load class object for Java EventLister interface</span>
+cls = java.lang.Class.forName(<span class="string">'java.awt.event.ActionListener'</span>)
+</pre><pre class="codeoutput"> 
+cls =
+
+interface java.awt.event.ActionListener
+
+</pre><p>Keep in mind this is a Class object for an ActionListener, not an instance.  With the ActionListener Class object we can verify that indeed this interface contains the actionPerformed method</p><pre class="codeinput"><span class="comment">% print out methods declared by the ActionListener interface</span>
+arrayfun(@(m)disp(char(m.toGenericString())),cls.getDeclaredMethods())
+</pre><pre class="codeoutput">public abstract void java.awt.event.ActionListener.actionPerformed(java.awt.event.ActionEvent)
+</pre><p>Alternatively, can ask for the system class loader directly</p><pre class="codeinput"><span class="comment">% get system class loader</span>
+classLoader = java.lang.ClassLoader.getSystemClassLoader();
+
+<span class="comment">% load the Class object using a class loader</span>
+cls = classLoader.loadClass(<span class="string">'java.awt.event.ActionListener'</span>)
+</pre><pre class="codeoutput"> 
+cls =
+
+interface java.awt.event.ActionListener
+
+</pre><p>Unfortunatly, the system ClassLoader in matlab is likewise restricted to the Java static classpath.</p><p>To load Classes on the dynamic classpath we can utilize special class loaders within <b>com.mathworks.jmi</b> package</p><div><ul><li>com.mathworks.jmi.CustomURLClassLoader</li><li>com.mathworks.jmi.ClassLoaderManager</li></ul></div><p>and proceed as follows</p><pre class="codeinput"><span class="comment">% add jar file dynamically (i.e. on the dynamic classpath)</span>
+javaaddpath(<span class="string">'../ProxyBuilder.jar'</span>)
+
+<span class="comment">% get jmi class loader</span>
+classLoader = com.mathworks.jmi.ClassLoaderManager.getClassLoaderManager()
+
+<span class="comment">% load Class for class defined in jar file</span>
+cls = classLoader.loadClass(<span class="string">'com.mypkg.TestInterface'</span>)
+</pre><pre class="codeoutput"> 
+classLoader =
+
+com.mathworks.jmi.ClassLoaderManager@5cd9072a
+
+
+cls =
+
+interface com.mypkg.TestInterface
+
+</pre><h2>References<a name="13"></a></h2><p>Java Doc:</p><div><ul><li><a href="http://docs.oracle.com/javase/8/docs/api/java/lang/Class.html">java.lang.Class</a></li><li><a href="http://docs.oracle.com/javase/8/docs/api/java/lang/ClassLoader.html">java.lang.ClassLoader</a></li></ul></div><div><ul><li><a href="http://docs.oracle.com/javase/8/docs/api/java/lang/reflect/package-summary.html">java.lang.reflect</a></li><li><a href="http://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html">java.lang.reflect.Method</a></li></ul></div><div><ul><li><a href="http://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html">java.util.ArrayList</a></li></ul></div><div><ul><li><a href="http://docs.oracle.com/javase/8/docs/api/java/util/List.html">java.util.List</a></li><li><a href="http://docs.oracle.com/javase/8/docs/api/java/util/RandomAccess.html">java.util.RandomAccess</a></li><li><a href="http://docs.oracle.com/javase/8/docs/api/java/lang/Cloneable.html">java.lang.Clonable</a></li><li><a href="http://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html">java.io.Serializable</a></li></ul></div><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p>
+</div></body></html>
